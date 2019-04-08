@@ -2,15 +2,16 @@ package com.soni.config;
 
 import javax.sql.DataSource;
 
+import org.mybatis.spring.annotation.MapperScan;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -21,29 +22,41 @@ import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.validator.Validator;
-import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import com.soni.entity.Person;
 import com.soni.validate.CsvBeanValidator;
 import com.soni.validate.CsvItemProcessor;
 
 @Configuration
-//@MapperScan("com.soni.mybatis")
+@MapperScan("com.soni.mybatis")
 @EnableBatchProcessing
 public class AppConfig {
 //https://innersource.accenture.com/projects/DMMIF
+	private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
 	
 	@Autowired
-	public JobBuilderFactory jobBuilderFactory;
-	
-	@Autowired
-	public StepBuilderFactory stepBuilderFactory;
+    private JobBuilderFactory jobs;
+
+    @Autowired
+    private StepBuilderFactory steps;
+
+    @Bean
+    public Job job(@Qualifier("step1") Step step1/*, @Qualifier("step2") Step step2*/) {
+        return jobs.get("myJob").start(step1)/*.next(step2)*/.build();
+    }
+
+//    @Bean
+//    protected Step step2(Tasklet tasklet) {
+//        return steps.get("step2")
+//            .tasklet(tasklet)
+//            .build();
+//    }
+    
 	/**
      * ItemReader定义,用来读取数据
      * 1，使用FlatFileItemReader读取文件
@@ -103,45 +116,45 @@ public class AppConfig {
         return writer;
     }
     
-    /**
-     * JobRepository，用来注册Job的容器
-     * jobRepositor的定义需要dataSource和transactionManager，Spring Boot已为我们自动配置了
-     * 这两个类，Spring可通过方法注入已有的Bean
-     * @param dataSource
-     * @param transactionManager
-     * @return
-     * @throws Exception
-     */
-    @Bean
-    public JobRepository jobRepository(@Qualifier("dataSource") DataSource dataSource, PlatformTransactionManager transactionManager)throws Exception{
+//    /**
+//     * JobRepository，用来注册Job的容器
+//     * jobRepositor的定义需要dataSource和transactionManager，Spring Boot已为我们自动配置了
+//     * 这两个类，Spring可通过方法注入已有的Bean
+//     * @param dataSource
+//     * @param transactionManager
+//     * @return
+//     * @throws Exception
+//     */
+//    @Bean
+//    public JobRepository jobRepository(@Qualifier("dataSource") DataSource dataSource, PlatformTransactionManager transactionManager)throws Exception{
+//
+//        JobRepositoryFactoryBean jobRepositoryFactoryBean =  new JobRepositoryFactoryBean();
+//        jobRepositoryFactoryBean.setDataSource(dataSource);
+//        jobRepositoryFactoryBean.setTransactionManager(transactionManager);
+//        jobRepositoryFactoryBean.setDatabaseType(DatabaseType.MYSQL.name());
+//        return jobRepositoryFactoryBean.getObject();
+//    }
 
-        JobRepositoryFactoryBean jobRepositoryFactoryBean =  new JobRepositoryFactoryBean();
-        jobRepositoryFactoryBean.setDataSource(dataSource);
-        jobRepositoryFactoryBean.setTransactionManager(transactionManager);
-        jobRepositoryFactoryBean.setDatabaseType(DatabaseType.MYSQL.name());
-        return jobRepositoryFactoryBean.getObject();
-    }
 
-
-    /**
-     * JobLauncher定义，用来启动Job的接口
-     * @param dataSource
-     * @param transactionManager
-     * @return
-     * @throws Exception
-     */
-    @Bean
-    public SimpleJobLauncher jobLauncher(@Qualifier("dataSource") DataSource dataSource, PlatformTransactionManager transactionManager)throws Exception{
-    	
-    	JobRepositoryFactoryBean jobRepositoryFactoryBean =  new JobRepositoryFactoryBean();
-        jobRepositoryFactoryBean.setDataSource(dataSource);
-        jobRepositoryFactoryBean.setTransactionManager(transactionManager);
-        jobRepositoryFactoryBean.setDatabaseType(DatabaseType.MYSQL.name());
-    	
-        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
-        jobLauncher.setJobRepository(jobRepositoryFactoryBean.getObject());
-        return jobLauncher;
-    }
+//    /**
+//     * JobLauncher定义，用来启动Job的接口
+//     * @param dataSource
+//     * @param transactionManager
+//     * @return
+//     * @throws Exception
+//     */
+//    @Bean
+//    public SimpleJobLauncher jobLauncher(@Qualifier("dataSource") DataSource dataSource, PlatformTransactionManager transactionManager)throws Exception{
+//    	
+//    	JobRepositoryFactoryBean jobRepositoryFactoryBean =  new JobRepositoryFactoryBean();
+//        jobRepositoryFactoryBean.setDataSource(dataSource);
+//        jobRepositoryFactoryBean.setTransactionManager(transactionManager);
+//        jobRepositoryFactoryBean.setDatabaseType(DatabaseType.MYSQL.name());
+//    	
+//        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+//        jobLauncher.setJobRepository(jobRepositoryFactoryBean.getObject());
+//        return jobLauncher;
+//    }
 
     /**
      * Job定义，我们要实际执行的任务，包含一个或多个Step
@@ -150,8 +163,8 @@ public class AppConfig {
      * @return
      */
     @Bean
-    public Job importJob(JobBuilderFactory jobBuilderFactory, Step s1){
-        return jobBuilderFactory.get("importJob")
+    public Job importJob(Step s1){
+        return jobs.get("importJob")
                 .incrementer(new RunIdIncrementer())
                 .flow(s1)//为Job指定Step
                 .end()
@@ -168,9 +181,9 @@ public class AppConfig {
      * @return
      */
     @Bean
-    public Step step1(StepBuilderFactory stepBuilderFactory, ItemReader<Person> reader, ItemWriter<Person> writer,
+    public Step step1(ItemReader<Person> reader, ItemWriter<Person> writer,
                       ItemProcessor<Person,Person> processor){
-        return stepBuilderFactory
+        return steps
                 .get("step1")
                 .<Person,Person>chunk(65000)//批处理每次提交65000条数据
                 .reader(reader)//给step绑定reader
@@ -178,6 +191,7 @@ public class AppConfig {
                 .writer(writer)//给step绑定writer
                 .build();
     }
+
 
 //    @Bean
 //    public CsvJobListener csvJobListener(){

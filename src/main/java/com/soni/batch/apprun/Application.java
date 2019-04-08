@@ -1,9 +1,15 @@
 package com.soni.batch.apprun;
 
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+
+import com.soni.config.AppConfig;
 
 
 
@@ -24,7 +30,19 @@ public class Application implements CommandLineRunner
 	@Override
 	public void run(String... args) throws Exception {
 		System.out.println("####################################################");
-//		System.out.println(personMapper.myBatisSelectSQL("select * from person"));
+//		System.out.println(personMapper.myBatisSelectSQL("select * from person"));        
+
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+        ctx.register(AppConfig.class);
+        ctx.refresh();
+        JobLauncher  jobLauncher = ctx.getBean(JobLauncher.class);
+        Job job = (Job)ctx.getBean("myJob");
+        try {
+            jobLauncher.run(job, new JobParameters());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        ctx.close();
 		System.out.println("####################################################");
 	}
 }
