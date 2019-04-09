@@ -43,42 +43,12 @@ public class PersonJobConfig {
 
     @Autowired
     private StepBuilderFactory steps;
-    
-//	@Autowired
-//	private JobWriter jobWriter;
-	
-//	@Autowired
-//	private JobReader jobReader;
+
 	
 	@Autowired
 	private CustomizedRepository customizedRepository;
     
-//    /**
-//     * 通过Spring JDBC 快速创建 DataSource
-//     *
-//     * @return DataSource
-//     */
-//    @Bean(name = "masterDataSource")
-//    @Qualifier("masterDataSource")
-//    @ConfigurationProperties(prefix = "spring.datasource")
-//    public DataSource masterDataSource() {
-//        return DataSourceBuilder.create().build();
-//    }
-    
-//    @Bean(name = "sqlSessionFactory")
-//    public SqlSessionFactoryBean sqlSessionFactory(@Qualifier("masterDataSource") DataSource datasource) throws Exception {
-//        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
-//        sessionFactory.setDataSource(datasource);
-//        //mapper文件location
-//        org.springframework.core.io.Resource[] resources =
-//                new PathMatchingResourcePatternResolver().getResources(
-//                        "classpath*:org/back/**/*Mapper.xml");
-//        sessionFactory.setMapperLocations(resources);
-//        org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
-//        configuration.setMapUnderscoreToCamelCase(true);//驼峰转换
-//        sessionFactory.setConfiguration(configuration);
-//        return sessionFactory;
-//    }
+
 
     @Bean
     public Job personJob(/*, @Qualifier("step2") Step step2*/) {
@@ -133,22 +103,15 @@ public class PersonJobConfig {
      */
     @Bean
     public ItemWriter<Person> writer( ){
-//        JdbcBatchItemWriter<Person> writer = new JdbcBatchItemWriter<>();
-//        //我们使用JDBC批处理的JdbcBatchItemWriter来写数据到数据库
-//        writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>());
-//        String sql = "insert into person "+" (name,age,nation,address) "
-//                +" values(:name,:age,:nation,:address)";
-//        //在此设置要执行批处理的SQL语句
-//        writer.setSql(sql);
-//        writer.setDataSource(datasource);
+
     	ItemWriter<Person> writer = new ItemWriter<Person>() {
     		@Override
     	    public void write(List<? extends Person> list) throws Exception {
     			StringBuilder sqlb = new StringBuilder();
-    			sqlb.append("insert into (name,age,nation,address) values ");
+    			sqlb.append("insert into person (name,age,nation,address) values ");
     			int c=0;
     	        for(Person person: list) {
-    	        	sqlb.append("("+person.getName()+","+person.getAge()+","+person.getNation()+","+person.getAddress()+")"+(c!=list.size()-1?",":""));
+    	        	sqlb.append("('"+person.getName()+"','"+person.getAge()+"','"+person.getNation()+"','"+person.getAddress()+"')"+(c!=list.size()-1?",":""));
     	        	c++;
     	        	System.out.println("===="+c);
     	        }
@@ -158,46 +121,6 @@ public class PersonJobConfig {
     	};
         return writer;
     }
-    
-//    /**
-//     * JobRepository，用来注册Job的容器
-//     * jobRepositor的定义需要dataSource和transactionManager，Spring Boot已为我们自动配置了
-//     * 这两个类，Spring可通过方法注入已有的Bean
-//     * @param dataSource
-//     * @param transactionManager
-//     * @return
-//     * @throws Exception
-//     */
-//    @Bean
-//    public JobRepository jobRepository(@Qualifier("dataSource") DataSource dataSource, PlatformTransactionManager transactionManager)throws Exception{
-//
-//        JobRepositoryFactoryBean jobRepositoryFactoryBean =  new JobRepositoryFactoryBean();
-//        jobRepositoryFactoryBean.setDataSource(dataSource);
-//        jobRepositoryFactoryBean.setTransactionManager(transactionManager);
-//        jobRepositoryFactoryBean.setDatabaseType(DatabaseType.MYSQL.name());
-//        return jobRepositoryFactoryBean.getObject();
-//    }
-
-
-//    /**
-//     * JobLauncher定义，用来启动Job的接口
-//     * @param dataSource
-//     * @param transactionManager
-//     * @return
-//     * @throws Exception
-//     */
-//    @Bean
-//    public SimpleJobLauncher jobLauncher(@Qualifier("dataSource") DataSource dataSource, PlatformTransactionManager transactionManager)throws Exception{
-//    	
-//    	JobRepositoryFactoryBean jobRepositoryFactoryBean =  new JobRepositoryFactoryBean();
-//        jobRepositoryFactoryBean.setDataSource(dataSource);
-//        jobRepositoryFactoryBean.setTransactionManager(transactionManager);
-//        jobRepositoryFactoryBean.setDatabaseType(DatabaseType.MYSQL.name());
-//    	
-//        SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
-//        jobLauncher.setJobRepository(jobRepositoryFactoryBean.getObject());
-//        return jobLauncher;
-//    }
 
     /**
      * Job定义，我们要实际执行的任务，包含一个或多个Step
