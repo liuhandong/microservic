@@ -1,6 +1,6 @@
 package com.soni.config;
 
-import javax.sql.DataSource;
+import java.util.List;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
@@ -11,12 +11,9 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
-import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
@@ -29,33 +26,64 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 import com.soni.entity.Person;
+import com.soni.repository.CustomizedRepository;
 import com.soni.validate.CsvBeanValidator;
 import com.soni.validate.CsvItemProcessor;
 
 @Configuration
-@MapperScan("com.soni.mybatis")
+@MapperScan(value = "com.soni.mybatis"/*,sqlSessionFactoryRef = "sqlSessionFactory"*/)
 @EnableBatchProcessing
-public class AppConfig {
+//@EnableTransactionManagement
+public class PersonJobConfig {
 //https://innersource.accenture.com/projects/DMMIF
-	private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
+	private static final Logger log = LoggerFactory.getLogger(PersonJobConfig.class);
 	
 	@Autowired
     private JobBuilderFactory jobs;
 
     @Autowired
     private StepBuilderFactory steps;
+    
+//	@Autowired
+//	private JobWriter jobWriter;
+	
+//	@Autowired
+//	private JobReader jobReader;
+	
+	@Autowired
+	private CustomizedRepository customizedRepository;
+    
+//    /**
+//     * 通过Spring JDBC 快速创建 DataSource
+//     *
+//     * @return DataSource
+//     */
+//    @Bean(name = "masterDataSource")
+//    @Qualifier("masterDataSource")
+//    @ConfigurationProperties(prefix = "spring.datasource")
+//    public DataSource masterDataSource() {
+//        return DataSourceBuilder.create().build();
+//    }
+    
+//    @Bean(name = "sqlSessionFactory")
+//    public SqlSessionFactoryBean sqlSessionFactory(@Qualifier("masterDataSource") DataSource datasource) throws Exception {
+//        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
+//        sessionFactory.setDataSource(datasource);
+//        //mapper文件location
+//        org.springframework.core.io.Resource[] resources =
+//                new PathMatchingResourcePatternResolver().getResources(
+//                        "classpath*:org/back/**/*Mapper.xml");
+//        sessionFactory.setMapperLocations(resources);
+//        org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
+//        configuration.setMapUnderscoreToCamelCase(true);//驼峰转换
+//        sessionFactory.setConfiguration(configuration);
+//        return sessionFactory;
+//    }
 
     @Bean
-    public Job job(@Qualifier("step1") Step step1/*, @Qualifier("step2") Step step2*/) {
-        return jobs.get("myJob").start(step1)/*.next(step2)*/.build();
+    public Job personJob(/*, @Qualifier("step2") Step step2*/) {
+        return jobs.get("myJob").start(step1())/*.next(step2)*/.build();
     }
-
-//    @Bean
-//    protected Step step2(Tasklet tasklet) {
-//        return steps.get("step2")
-//            .tasklet(tasklet)
-//            .build();
-//    }
     
 	/**
      * ItemReader定义,用来读取数据
@@ -66,7 +94,7 @@ public class AppConfig {
      * @throws Exception
      */
     @Bean
-    public ItemReader<Person> reader()throws Exception {
+    public ItemReader<Person> reader() {
         FlatFileItemReader<Person> reader = new FlatFileItemReader<>();
         reader.setResource(new ClassPathResource("person.csv"));
         reader.setLineMapper(new DefaultLineMapper<Person>(){
@@ -104,15 +132,30 @@ public class AppConfig {
      * @return
      */
     @Bean
-    public ItemWriter<Person> writer(@Qualifier("dataSource") DataSource dataSource){
-        JdbcBatchItemWriter<Person> writer = new JdbcBatchItemWriter<>();
-        //我们使用JDBC批处理的JdbcBatchItemWriter来写数据到数据库
-        writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>());
-        String sql = "insert into person "+" (name,age,nation,address) "
-                +" values(:name,:age,:nation,:address)";
-        //在此设置要执行批处理的SQL语句
-        writer.setSql(sql);
-        writer.setDataSource(dataSource);
+    public ItemWriter<Person> writer( ){
+//        JdbcBatchItemWriter<Person> writer = new JdbcBatchItemWriter<>();
+//        //我们使用JDBC批处理的JdbcBatchItemWriter来写数据到数据库
+//        writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>());
+//        String sql = "insert into person "+" (name,age,nation,address) "
+//                +" values(:name,:age,:nation,:address)";
+//        //在此设置要执行批处理的SQL语句
+//        writer.setSql(sql);
+//        writer.setDataSource(datasource);
+    	ItemWriter<Person> writer = new ItemWriter<Person>() {
+    		@Override
+    	    public void write(List<? extends Person> list) throws Exception {
+    			StringBuilder sqlb = new StringBuilder();
+    			sqlb.append("insert into (name,age,nation,address) values ");
+    			int c=0;
+    	        for(Person person: list) {
+    	        	sqlb.append("("+person.getName()+","+person.getAge()+","+person.getNation()+","+person.getAddress()+")"+(c!=list.size()-1?",":""));
+    	        	c++;
+    	        	System.out.println("===="+c);
+    	        }
+    	        customizedRepository.myBatisUpdateSQL(sqlb.toString());
+    	        customizedRepository.myBatisUpdateSQL("delete from person");
+    	    }
+    	};
         return writer;
     }
     
@@ -181,14 +224,13 @@ public class AppConfig {
      * @return
      */
     @Bean
-    public Step step1(ItemReader<Person> reader, ItemWriter<Person> writer,
-                      ItemProcessor<Person,Person> processor){
+    public Step step1(){
         return steps
                 .get("step1")
-                .<Person,Person>chunk(65000)//批处理每次提交65000条数据
-                .reader(reader)//给step绑定reader
-                .processor(processor)//给step绑定processor
-                .writer(writer)//给step绑定writer
+                .<Person,Person>chunk(10)//批处理每次提交10条数据
+                .reader(reader())//给step绑定reader
+                .processor(processor())//给step绑定processor
+                .writer(writer())//给step绑定writer
                 .build();
     }
 
