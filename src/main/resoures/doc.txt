@@ -1,0 +1,73 @@
+正则表达式文件名及后缀、 路径
+([^<>/\\\|:""\*\?]+\.\w+$)
+^(.*)\\
+
+1 如何保证代码线程安全，哪个关键字，能修饰什么
+2 文本文件读字符串
+3 设计模式 说说你常用的
+四.用过哪些数据库 mysql groupby where order by 顺序
+五.事务有哪些特性
+六.数据库事务隔离级别
+	https://www.cnblogs.com/fjdingsd/p/5273008.html
+七.事务的传播属性
+	PROPAGATION_REQUIRED--支持当前事务，如果当前没有事务，就新建一个事务。这是最常见的选择。
+	PROPAGATION_SUPPORTS--支持当前事务，如果当前没有事务，就以非事务方式执行。
+	PROPAGATION_MANDATORY（mandatory 强制、托管）--支持当前事务，如果当前没有事务，就抛出异常。
+	PROPAGATION_REQUIRES_NEW--新建事务，如果当前存在事务，把当前事务挂起。
+		比如我们设计ServiceA.methodA的事务级别为PROPAGATION_REQUIRED，ServiceB.methodB的事务级别为PROPAGATION_REQUIRES_NEW，
+		那么当执行到ServiceB.methodB的时候，ServiceA.methodA所在的事务就会挂起，ServiceB.methodB会起一个新的事务，等待ServiceB.methodB的事务完成以后，
+		他才继续执行。他与PROPAGATION_REQUIRED 的事务区别在于事务的回滚程度了。因为ServiceB.methodB是新起一个事务，那么就是存在
+		两个不同的事务。如果ServiceB.methodB已经提交，那么ServiceA.methodA失败回滚，ServiceB.methodB是不会回滚的。如果ServiceB.methodB失败回滚，
+		如果他抛出的异常被ServiceA.methodA捕获，ServiceA.methodA事务仍然可能提交。
+	PROPAGATION_NOT_SUPPORTED--以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。
+		当前不支持事务。比如ServiceA.methodA的事务级别是PROPAGATION_REQUIRED ，而ServiceB.methodB的事务级别是PROPAGATION_NOT_SUPPORTED ，
+		那么当执行到ServiceB.methodB时，ServiceA.methodA的事务挂起，而他以非事务的状态运行完，再继续ServiceA.methodA的事务。
+	PROPAGATION_NEVER--以非事务方式执行，如果当前存在事务，则抛出异常。
+		不能在事务中运行。假设ServiceA.methodA的事务级别是PROPAGATION_REQUIRED， 而ServiceB.methodB的事务级别是PROPAGATION_NEVER ，
+		那么ServiceB.methodB就要抛出异常了。
+	PROPAGATION_NESTED
+		理解Nested的关键是savepoint。与PROPAGATION_REQUIRES_NEW的区别是，PROPAGATION_REQUIRES_NEW另起一个事务，将会与它的父事务相互独立；
+		而Nested的事务和它的父事务是相依的，它的提交是要等和它的父事务一起提交的。也就是说，如果父事务最后回滚，它也要回滚的。
+		而Nested事务的好处是它有一个savepoint。
+8.mybatis做一个spring项目的过程，如果建项目 配置文件
+9.spring mvc 处理httprequest的过程
+	https://blog.csdn.net/uncle_king/article/details/79253365
+10.springboot和spring mvc的区别
+	https://blog.csdn.net/u014590757/article/details/79602309
+11.springboot如何使用redis
+十二 线程池怎么创建，有哪些类型
+13.Volitel关键字的作用
+14.aotmic 原子类型的原理
+15 copyonwrite arraylist
+https://blog.csdn.net/linsongbin1/article/details/54581787
+16.controller和restcontroller的区别
+十七.如何设置springmvc response的contentType
+十八.常用的httpstatus 503 400
+19.java动态代理 jdk如何实现动态代理，用到了哪个类
+20.cglib对类的动态代理
+二一.如何设置httpstatus的自定义的code
+二二.跨域问题如何处理
+二三.同源策略 域名 ip 端口
+24.httpbasic的原理
+25.slf 和 log4j的关系
+26.maven如何标示一个dependency artifact groupid version
+27.maven的pom继承依赖 dependencyManagement
+28.spring factory bean 举例说几个
+29.redis 如何设置缓存过期时间，为什么redis快，内存 NIO
+30.tomcat的参数配置
+三一.乐观锁 悲观锁，读多写少，读少写多 都用什么锁，列举几种常用的java锁
+32.Linux的常用命令 scp find-name , 在文件里面查询关键字
+三三.如何在linux里面打印java的线程状况
+三四.用过哪些消息中间件，rabbitMQ发消息，都设计哪些参数，exchange topic brocker
+三五.正则表达式 pattern
+三六.你的系统如何与第三方系统对接，有哪些对接方式，协议层如何设计
+三七.什么时候用rest什么时候用rabbitMQ ，同步 异步 实时性，系统解耦
+38.docker K8S ，devops，知道的说，不会就不用说
+
+
+Java中的CAS实现原理
+https://www.cnblogs.com/javalyy/p/8882172.html
+在计算机科学中，比较和交换（Conmpare And Swap）是用于实现多线程同步的原子指令。 它将内存位置的内容与给定值进行比较，
+只有在相同的情况下，将该内存位置的内容修改为新的给定值。 这是作为单个原子操作完成的。 原子性保证新值基于最新信息计算; 
+如果该值在同一时间被另一个线程更新，则写入将失败。 操作结果必须说明是否进行替换; 
+这可以通过一个简单的布尔响应（这个变体通常称为比较和设置），或通过返回从内存位置读取的值来完成
