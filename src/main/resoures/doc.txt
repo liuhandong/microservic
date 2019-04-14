@@ -39,12 +39,23 @@
 13.Volitel关键字的作用
 14.aotmic 原子类型的原理
 15 copyonwrite arraylist
-https://blog.csdn.net/linsongbin1/article/details/54581787
+	https://blog.csdn.net/linsongbin1/article/details/54581787
 16.controller和restcontroller的区别
 十七.如何设置springmvc response的contentType
+	@RequestMapping(value = "/upload",produces="application/json;charset=UTF-8")
 十八.常用的httpstatus 503 400
+	400 （错误请求） 服务器不理解请求的语法。
+	500 （服务器内部错误） 服务器遇到错误，无法完成请求。	
+	503 （服务不可用） 服务器目前无法使用（由于超载或停机维护）。 通常，这只是暂时状态。
+	https://www.jianshu.com/p/369db1ba04ea
 19.java动态代理 jdk如何实现动态代理，用到了哪个类
+	https://blog.csdn.net/cckevincyh/article/details/54962920
+	https://blog.csdn.net/wang379275614/article/details/42218949
 20.cglib对类的动态代理
+	JDK动态代理与CGLIB代理区别
+    *JDK动态代理对实现了接口的类进行代理
+    *CGLIB代理可以对普通类代理，主要对指定的类生成一个子类，因为是继承，所以我们的目标类最好不要使用Final声明。
+	提供代理类的功能是为了让以前的或第三方的没有实现接口的类也能够被通知，被标记为final的方法不能被通知。
 二一.如何设置httpstatus的自定义的code
 二二.跨域问题如何处理
 二三.同源策略 域名 ip 端口

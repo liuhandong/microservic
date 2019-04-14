@@ -27,10 +27,14 @@
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-web</artifactId>
+	</dependency>
+	<dependency>
+	   <groupId>org.springframework.boot</groupId>
+	   <artifactId>spring-boot-starter-data-jpa</artifactId>
 	</dependency>  
 	<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-data-redis</artifactId>
 	</dependency>	
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
@@ -45,7 +49,24 @@
 		<artifactId>mybatis-spring-boot-starter</artifactId>
 		<version>2.0.1</version>
 	</dependency>
-	
+	<dependency>
+	   <groupId>org.apache.shiro</groupId>
+	   <artifactId>shiro-spring</artifactId>
+	   <version>1.4.0</version>
+	</dependency>	
+	<!-- redis-cache 工具类 -->
+	<dependency>
+	        <groupId>com.google.guava</groupId>
+	        <artifactId>guava</artifactId>
+	        <version>19.0</version>
+	</dependency>
+	        
+	<dependency>
+	         <groupId>org.projectlombok</groupId>
+	         <artifactId>lombok</artifactId>
+	          <scope>compile</scope>
+	</dependency>
+
 <!-- 	<dependency> -->
 <!-- 		<groupId>org.springframework.boot</groupId> -->
 <!-- 		<artifactId>spring-boot-devtools</artifactId> -->
@@ -78,11 +99,13 @@
     	<optional>true</optional>
     </dependency>
   </dependencies>
-  <plugins>
-  	<plugin>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-maven-plugin</artifactId>
-	</plugin>
+	<build>
+	<plugins>
+	  	<plugin>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-maven-plugin</artifactId>
+		</plugin>  
+	  </plugins>
+	</build>
   
-  </plugins>
 </project>

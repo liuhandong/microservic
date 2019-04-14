@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 
 @Configuration
 @EnableCaching
-//https://blog.csdn.net/guokezhongdeyuzhou/article/details/79789629
+// 
 public class RedisConfiguration  extends CachingConfigurerSupport {
 
     @Bean

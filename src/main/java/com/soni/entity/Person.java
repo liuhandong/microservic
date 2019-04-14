@@ -13,7 +13,7 @@ address VARCHAR(20)
 
 
 	 */
-	
+	Long id;
 	String name;
 	String age;
 	String nation;
@@ -41,6 +41,12 @@ address VARCHAR(20)
 	}
 	public void setAddress(String address) {
 		this.address = address;
+	}
+	public Long getId() {
+		return null;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 	
