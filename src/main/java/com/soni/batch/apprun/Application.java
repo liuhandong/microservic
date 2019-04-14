@@ -21,7 +21,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 
 @SpringBootApplication
-@ComponentScan("com.soni.config,com.soni.batch.writer,com.soni.batch.reader,com.soni.repository,com.soni.controller")
+@ComponentScan("com.soni.service,com.soni.config,com.soni.batch.writer,com.soni.batch.reader,com.soni.repository,com.soni.controller")
 public class Application /*implements CommandLineRunner*/
 {
 	
