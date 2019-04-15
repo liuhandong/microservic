@@ -1,6 +1,12 @@
 package com.soni.entity;
 
-public class Person {
+import java.io.Serializable;
+
+public class Person implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5207311106562881868L;
 	/*
 CREATE TABLE person(
 id int PRIMARY KEY AUTO_INCREMENT,
@@ -43,7 +49,7 @@ address VARCHAR(20)
 		this.address = address;
 	}
 	public Long getId() {
-		return null;
+		return this.id;
 	}
 	public void setId(Long id) {
 		this.id = id;

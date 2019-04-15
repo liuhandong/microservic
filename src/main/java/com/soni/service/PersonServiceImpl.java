@@ -31,14 +31,14 @@ public class PersonServiceImpl implements PersonService{
     @CachePut(value = "person", key = "'person'.concat(#person.id.toString())")
     public void update(Person person) {
         log.info("update db, person: {}", person.toString());
-    	System.out.println("findpersonById query from db, id: {}======");
+    	System.out.println("findpersonById query from db, id: {}======"+person.getId()+":"+person.getName());
     	personMap.put(person.getId(), person);
     }
  
     @Override
     @CacheEvict(value = "person", key = "'person'.concat(#id.toString())")
     public void remove(Long id) {
-        //log.info("remove from db, id: {}", id);
+        log.info("remove from db, id: {}", id);
     	System.out.println("findpersonById query from db, id: {}======");
     	personMap.remove(id);
     }

@@ -3,15 +3,18 @@ package com.soni.mybatis;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.cache.annotation.CacheConfig;
 /**
  * http://www.mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/
  * @author handong.liu
  *
  */
-//@Mapper
+@Mapper
+@CacheConfig(cacheNames = "persons")
 public interface PersonMapper {
 	
 	//执行任意SELECT语句（利用LinkedHashMap接收返回的结果）

@@ -1,6 +1,7 @@
 package com.soni.config;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
@@ -15,13 +16,11 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.time.Duration;
-
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableCaching
@@ -39,6 +38,7 @@ public class RedisConfiguration  extends CachingConfigurerSupport {
                 for (Object obj : params) {
                     sb.append(obj.toString());
                 }
+                System.out.println("############"+sb.toString());
                 return sb.toString();
             }
         };
@@ -75,6 +75,8 @@ public class RedisConfiguration  extends CachingConfigurerSupport {
         RedisCacheManager cacheManager = new RedisCacheManager(redisCacheWriter, defaultCacheConfig);
         return cacheManager;
     }
+
+
     @Bean
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
         StringRedisTemplate template = new StringRedisTemplate(factory);
@@ -83,7 +85,12 @@ public class RedisConfiguration  extends CachingConfigurerSupport {
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         jackson2JsonRedisSerializer.setObjectMapper(om);
+        //template.setValueSerializer(jackson2JsonRedisSerializer);
+        StringRedisSerializer srs = new StringRedisSerializer();
         template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.setKeySerializer(srs);
+        template.setHashKeySerializer(srs);
+        template.setHashValueSerializer(jackson2JsonRedisSerializer);
         template.afterPropertiesSet();
         return template;
     }
