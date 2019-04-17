@@ -4,10 +4,10 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.soni.config.PersonJobConfig;
+import com.soni.config.JobConfig;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {PersonJobConfig.class})
+@ContextConfiguration(classes = {JobConfig.class})
 public class JobExecuteTest {
 
 }

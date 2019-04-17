@@ -6,7 +6,7 @@ public interface PersonService {
 
 	Person findPersonById(Long id);
 
-	void update(Person person);
+	Long update(Person person);
 
 	void remove(Long id);
 

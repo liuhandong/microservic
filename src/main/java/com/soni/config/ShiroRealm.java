@@ -17,14 +17,14 @@ import com.soni.entity.SysRole;
 import com.soni.entity.User;
 import com.soni.service.UserService;
 
-public class MyShiroRealm  extends AuthorizingRealm{
+public class ShiroRealm  extends AuthorizingRealm{
 	@Resource
     private UserService userService;
 
     //权限信息，包括角色以及权限
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        System.out.println("权限配置-->MyShiroRealm.doGetAuthorizationInfo()");
+        System.out.println("权限配置-->ShiroRealm.doGetAuthorizationInfo()");
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         //如果身份认证的时候没有传入User对象，这里只能取到userName
         //也就是SimpleAuthenticationInfo构造的时候第一个参数传递需要User对象
@@ -43,7 +43,7 @@ public class MyShiroRealm  extends AuthorizingRealm{
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
             throws AuthenticationException {
-        System.out.println("MyShiroRealm.doGetAuthenticationInfo()");
+        System.out.println("ShiroRealm.doGetAuthenticationInfo()");
         //获取用户的输入的账号.
         String userName = (String)token.getPrincipal();
         System.out.println(token.getCredentials());

@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.soni.config.PersonJobConfig;
+import com.soni.config.JobConfig;
 import com.soni.repository.CustomizedRepository;
 
 import junit.framework.TestCase;
@@ -40,7 +40,7 @@ public class AppTest extends TestCase {
     private JobLauncher jobLauncher;
 	
 	@Autowired
-	PersonJobConfig appConfig;
+	JobConfig appConfig;
 	
 
 	

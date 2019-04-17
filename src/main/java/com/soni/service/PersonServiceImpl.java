@@ -19,7 +19,7 @@ public class PersonServiceImpl implements PersonService{
 	private Map<Long, Person> personMap = new HashMap<>();
 	
 	@Override
-    @Cacheable(value = "person", key = "'person'.concat(#id.toString())")
+    @Cacheable(value = "persons",/* key = "'person'.concat(#id.toString())",*/ keyGenerator = "keyGenerator")
     public Person findPersonById(Long id) {
         log.info("findpersonById query from db, id: {}", id);
     	System.out.println("findpersonById query from db, id: {}======"+id);
@@ -28,11 +28,12 @@ public class PersonServiceImpl implements PersonService{
 	
 
     @Override
-    @CachePut(value = "person", key = "'person'.concat(#person.id.toString())")
-    public void update(Person person) {
+    @CachePut(value = "persons", /*key = "'person'.concat(#person.id.toString())",*/ keyGenerator = "keyGenerator")
+    public Long update(Person person) {
         log.info("update db, person: {}", person.toString());
-    	System.out.println("findpersonById query from db, id: {}======"+person.getId()+":"+person.getName());
+    	System.out.println("update query from db, id: {}======"+person.getId()+":"+person.getName());
     	personMap.put(person.getId(), person);
+    	return 20L;
     }
  
     @Override

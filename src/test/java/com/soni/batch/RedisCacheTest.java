@@ -17,7 +17,7 @@ public class RedisCacheTest {
 	@Autowired
 	PersonService personService;
 	
-	@Test
+	//@Test
 	public void findPersonById() {
 		Long id=10L;
 		personService.findPersonById(id);
@@ -26,12 +26,17 @@ public class RedisCacheTest {
 	@Test
 	public void update() {
 		Person person = new Person();
-		person.setId(38L);
+		Long id = 38L;
+		person.setId(id);
 		person.setName("test08");
 		person.setAddress("dalian");
 		person.setAge("25");
 		person.setNation("CHINA");
 		personService.update(person);
+		System.out.println("-----first------------");
+		System.out.println( personService.findPersonById(id).getName());
+		System.out.println("-----second------------");
+		System.out.println( personService.findPersonById(id).getName());
 	}
 	
 

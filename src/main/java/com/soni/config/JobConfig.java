@@ -34,9 +34,9 @@ import com.soni.validate.CsvItemProcessor;
 @MapperScan(value = "com.soni.mybatis"/*,sqlSessionFactoryRef = "sqlSessionFactory"*/)
 @EnableBatchProcessing
 //@EnableTransactionManagement
-public class PersonJobConfig {
+public class JobConfig {
 //https://innersource.accenture.com/projects/DMMIF
-	private static final Logger log = LoggerFactory.getLogger(PersonJobConfig.class);
+	private static final Logger log = LoggerFactory.getLogger(JobConfig.class);
 	
 	@Autowired
     private JobBuilderFactory jobs;
